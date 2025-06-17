@@ -1,0 +1,26 @@
+{
+  "applications": [
+    {
+      "name_view": "name-to-be-displayed-on-selection",
+      "name_real": "real-name-of-application(foldername)",
+      "folder": "application-path",
+      "logs": {
+        "folder": "log-path-relative-to-application-folder",
+        "colors": true,
+        "files": [
+          {
+            "name_view": "name-to-be-displayed-on-selection",
+            "name_real": "real-lof-file-name"
+          }
+        ]
+      }
+    }
+  ],
+  "colors": [
+    {
+      "keyword": "keyword",
+      "color": "color",
+      "keep": true
+    }
+  ]
+}

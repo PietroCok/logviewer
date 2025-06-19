@@ -10,7 +10,7 @@ function applyColors(content) {
 
   const output = [];
 
-  for (const line of lines) {
+  for (let line of lines) {
     // Ignore empty lines
     if (line.trim() == '') {
       continue;
@@ -27,11 +27,20 @@ function applyColors(content) {
     }
 
     // apply color if needed
-    if (color_config.currentColor?.color) {
-      output.push(chalk[color_config.currentColor.color](line));
-    } else {
-      output.push(line);
+    let color = color_config.currentColor?.color;
+    if (color) {
+      if(color.startsWith("#")){
+        // hex color
+        line = chalk.hex(color)(line);
+      } else {
+        try {
+          line = chalk[color](line);
+        } catch (unsopported_color) {}
+      }
     }
+
+    // insert into output buffer
+    output.push(line);
 
     // reset color if should not be kept
     if (!color_config.currentColor?.keep) {

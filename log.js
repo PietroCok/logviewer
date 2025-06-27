@@ -67,7 +67,12 @@ function watchFile(filePath, interval = 500) {
       lastFileSize = stats.size;
     }
   } catch (err) {
-    console.error(err);
+    if(err.code == "ENOENT"){
+      console.error(chalk.red(`Requested file NOT found: ${filePath}`));
+      process.exit(1);
+    } else {
+      console.error(err);
+    }
     return;
   }
 
@@ -205,8 +210,8 @@ const log_folder = app.logs.folder;
 let title = app.name_real + "-" + log.name_real;
 const log_full_path = `${base_folder}/${app.name_real}/${log_folder}/${log.name_real}`.replaceAll("//", "/");
 
-_clear();
 mapHotKeys();
 
 process.stdout.write('\x1b]0;' + title + '\x07');
 watchFile(log_full_path);
+_clear();

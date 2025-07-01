@@ -4,7 +4,7 @@ import prompts from 'prompts';
 import config from './config.json' with { type: "json" };
 
 // Function to manipulate new content
-function applyColors(content) {
+function manipulateContent(content) {
   // split content line by line
   const lines = content.split(/\r?\n/);
 
@@ -16,28 +16,11 @@ function applyColors(content) {
       continue;
     }
 
-    // Find correct color for the line, looking for keywords
-    // skip lines in stacktraces
-    if (!line.trim().startsWith("at") && color_config.colors) {
-      for (const cc of color_config.colors) {
-        if (line.includes(cc.keyword)) {
-          color_config.currentColor = cc;
-        }
-      }
-    }
+    // choose color, keep old one if not needed
+    color_config.currentColor = getLineColor(line) || color_config.currentColor;
 
     // apply color if needed
-    let color = color_config.currentColor?.color;
-    if (color) {
-      if(color.startsWith("#")){
-        // hex color
-        line = chalk.hex(color)(line);
-      } else {
-        try {
-          line = chalk[color](line);
-        } catch (unsopported_color) {}
-      }
-    }
+    line = applyColor(line, color_config.currentColor?.color);
 
     // insert into output buffer
     output.push(line);
@@ -49,6 +32,53 @@ function applyColors(content) {
   }
 
   return output;
+}
+
+/**
+ * Return new line color or null 
+ */
+function getLineColor(line) {
+  let color = null;
+
+  // also skip lines in stacktraces
+  if (!line.trim().startsWith("at") && color_config.colors) {
+    for (const cc of color_config.colors) {
+      // can use keyword as string or regex
+      if (cc.keyword.startsWith("/")) {
+        // convert string to regex (removing also first and last '/')
+        const regex = new RegExp(cc.keyword.slice(1, -1))
+        if (regex.test(line)) {
+          color = cc;
+        }
+      } else {
+        if (line.includes(cc.keyword)) {
+          color = cc;
+        }
+      }
+    }
+  }
+  return color;
+}
+
+/**
+ * Applies the color to the text, supports both chalk functions and hex formatted colors
+ * @param {String} text text to be colored
+ * @param {String} color chalk function or hex formatted color (must start with '#')
+ * @returns Colored text
+ */
+function applyColor(text, color) {
+  if (!color) return text;
+
+  if (color.startsWith("#")) {
+    // hex color
+    text = chalk.hex(color)(text);
+  } else {
+    try {
+      text = chalk[color](text);
+    } catch (unsopported_color) { }
+  }
+
+  return text;
 }
 
 /**
@@ -67,7 +97,7 @@ function watchFile(filePath, interval = 500) {
       lastFileSize = stats.size;
     }
   } catch (err) {
-    if(err.code == "ENOENT"){
+    if (err.code == "ENOENT") {
       console.error(chalk.red(`Requested file NOT found: ${filePath}`));
       process.exit(1);
     } else {
@@ -96,7 +126,7 @@ function watchFile(filePath, interval = 500) {
 
       // Once we have the new content, manipulate and output it
       stream.on('end', () => {
-        const manipulatedContent = applyColors(newContent);
+        const manipulatedContent = manipulateContent(newContent);
         for (const line of manipulatedContent) {
           console.log(line);
         }

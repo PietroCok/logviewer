@@ -81,21 +81,10 @@ function applyColor(text, color) {
   return text;
 }
 
-/**
- * Watches a file for changes
- * @param {String} filePath - path of the file to watch
- * @param {Number} [interval=2000] - Time (ms) between a check and the next
- */
-function watchFile(filePath, interval = 500) {
-  // Track the last known size of the file
-  let lastFileSize = 0;
-
+function getFileSize(filePath){
   try {
     const stats = fs.statSync(filePath);
-
-    if (stats.size > 0) {
-      lastFileSize = stats.size;
-    }
+    return stats.size;
   } catch (err) {
     if (err.code == "ENOENT") {
       console.error(chalk.red(`Requested file NOT found: ${filePath}`));
@@ -103,6 +92,19 @@ function watchFile(filePath, interval = 500) {
     } else {
       console.error(err);
     }
+    return -1;
+  }
+}
+
+/**
+ * Watches a file for changes
+ * @param {String} filePath - path of the file to watch
+ * @param {Number} [interval=2000] - Time (ms) between a check and the next
+ */
+function watchFile(filePath, interval = 500) {
+  // Track the last known size of the file
+  let lastFileSize = getFileSize(filePath);
+  if(lastFileSize < 0){
     return;
   }
 
@@ -132,9 +134,9 @@ function watchFile(filePath, interval = 500) {
         }
       });
 
-      // Update the last known size of the file
-      lastFileSize = curr.size;
     }
+    // Update the last known size of the file
+    lastFileSize = curr.size;
   });
 }
 

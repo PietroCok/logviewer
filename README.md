@@ -40,8 +40,8 @@ Configure the log-related settings:
 
 ### Default Colors
 Define colors for specific keywords across all applications. Each color rule includes:
-- **`keyword`**: The keyword to match in the logs.
-- **`color`**: The color to apply to the matched keyword.
+- **`keyword`**: The keyword to match in the logs, or a regular expression (identified by leading and trailing '/').
+- **`color`**: The color to apply to the matched keyword, accept both standard chalk functions or hex values (hex values must start with a '#').
 - **`keep`**: Whether to retain the last applied color until a new keyword is found.
 
 4. Save your changes and restart the application.

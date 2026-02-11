@@ -1,0 +1,98 @@
+{
+  "$schema": "http://json-schema.org/draft/2019-09/schema#",
+  "type": "object",
+  "properties": {
+    "applications": {
+      "type": "array",
+      "description": "List of applications to display",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name_view": {
+            "type": "string",
+            "description": "Name to be presented to the user"
+          },
+          "name_real": {
+            "type": "string",
+            "description": "Actual name of application folder (usually the foldername)"
+          },
+          "folder": {
+            "type": "string",
+            "description": "Path to the application folder (application folder excluded)"
+          },
+          "logs": {
+            "type": "object",
+            "properties": {
+              "folder": {
+                "type": "string",
+                "description": "relative path from application folder to log folder"
+              },
+              "colors": {
+                "type": "boolean",
+                "description": "Choose if you want to apply color filters"
+              },
+              "files": {
+                "type": "array",
+                "description": "List of log files",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "name_view": {
+                      "type": "string",
+                      "description": "Name to be presented to the user"
+                    },
+                    "name_real": {
+                      "type": "string",
+                      "description": "Actual name of log file"
+                    }
+                  },
+                  "required": [
+                    "name_real",
+                    "name_view"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "name_real",
+          "name_view",
+          "folder",
+          "logs"
+        ]
+      }
+    },
+    "colors": {
+      "type": "array",
+      "description": "Color configuration",
+      "items": {
+        "type": "object",
+        "properties": {
+          "keyword": {
+            "type": "string",
+            "description": "Keyword or regex used to match the line"
+          },
+          "color": {
+            "type": "string",
+            "description": "Name or hex value of the color to apply"
+          },
+          "keep": {
+            "type": "boolean",
+            "description": "Keep this color until a new match is found"
+          }
+        },
+        "required": [
+          "keyword",
+          "color",
+          "keep"
+        ]
+      }
+    }
+  },
+  "required": [
+    "applications",
+    "colors"
+  ],
+  "additionalProperties": false
+}
